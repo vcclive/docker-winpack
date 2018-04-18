@@ -1,8 +1,8 @@
 # docker-winpack
 Docker container based on suchja/wix:latest containing the following extra tools:
-*innosetup
-*reshacker
-*xvfb
+* innosetup
+* reshacker
+* xvfb
 
 ```
 docker run --rm -it --entrypoint /bin/bash v install-win:/home/xclient/install-win vcc/winpack \
