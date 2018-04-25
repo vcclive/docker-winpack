@@ -1,7 +1,7 @@
 # docker-winpack
 Docker container based on suchja/wix:latest containing the following extra tools:
 * innosetup
-* reshacker
+* reshacker 3.4 (old one)
 * xvfb
 
 ```
