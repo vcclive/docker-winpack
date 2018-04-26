@@ -1,7 +1,9 @@
 FROM ubuntu:18.04
 MAINTAINER Tamas Jalsovszky <tamas.jalsovszky@vcc.live>
+# Inspired by suchja/*
 
-# Inspired by suchja/wine, suchja/wix
+COPY waitonprocess.sh /scripts/
+RUN chmod +x /scripts/waitonprocess.sh
 
 # get at least error information from wine
 ENV WINEDEBUG -all,err+all
@@ -18,21 +20,11 @@ RUN addgroup --system xusers \
 	    --quiet \
 	    xclient
 
-# Wine really doesn't like to be run as root, so let's use a non-root user
-USER xclient
-ENV HOME /home/xclient
-ENV WINEPREFIX /home/xclient/.wine32
-# set default wine arch
-ENV WINEARCH win32
-
 # Use xclient's home dir as working dir
 WORKDIR /home/xclient
 
-USER root
-
-RUN dpkg --add-architecture i386
-
 # Install some tools required for creating the image
+RUN dpkg --add-architecture i386
 RUN sed -i "s/main/main contrib non-free/" /etc/apt/sources.list
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
@@ -51,7 +43,19 @@ RUN apt-get install -y --no-install-recommends \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
+ENV WINE_MONO_VERSION 4.7.1
+# Get latest version of mono for wine, installed by wine upon demand
+RUN mkdir -p /usr/share/wine/mono \
+	&& curl -SL 'http://dl.winehq.org/wine/wine-mono/$WINE_MONO_VERSION/wine-mono-$WINE_MONO_VERSION.msi' -o /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi \
+	&& chmod +x /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi
+
+# Wine really doesn't like to be run as root, so let's use a non-root user
 USER xclient
+ENV HOME /home/xclient
+ENV WINEPREFIX /home/xclient/.wine32
+# set default wine arch
+ENV WINEARCH win32
+RUN wineboot --update
 
 # Install Resource Hacker 4.7.x
 RUN mkdir reshack \
@@ -70,10 +74,10 @@ RUN mkdir innosetup \
 	&& rm innounp* is-unicode.exe
 
 # Install .NET Framework 4.0
-RUN wine wineboot --init \
-	#&& /scripts/waitonprocess.sh wineserver \
-	&& winetricks --unattended dotnet40 dotnet_verifier
-	#&& /scripts/waitonprocess.sh wineserver
+RUN wine wineboot --update \
+	&& /scripts/waitonprocess.sh wineserver \
+	&& winetricks --unattended dotnet40 dotnet_verifier \
+	&& /scripts/waitonprocess.sh wineserver
 
 # Install Wix Toolset
 RUN mkdir wix \
