@@ -3,7 +3,7 @@ MAINTAINER Tamas Jalsovszky <tamas.jalsovszky@vcc.live>
 # Inspired by suchja/*
 
 COPY waitonprocess.sh /scripts/
-RUN chmod +x /scripts/waitonprocess.sh
+RUN chmod 755 /scripts/waitonprocess.sh
 
 # get at least error information from wine
 ENV WINEDEBUG -all,err+all
