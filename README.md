@@ -10,11 +10,9 @@ Docker container based on suchja/* and Ubuntu Bionic (18.04) containing the foll
 
 The default wine environment is 32bit.
 
-Environment variables:
-* myuser (defaults to jenkins)
-* myuid (defaults to 1000)
-* mygroup (defaults to jenkins)
-* mygid (defaults to 1000)
+Build variables (e.g. docker build --build-arg myuid=1111 ...):
+* myuid
+* mygid
 
 
 ```
