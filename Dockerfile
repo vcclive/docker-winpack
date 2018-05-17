@@ -45,6 +45,7 @@ RUN apt-get install -y --no-install-recommends \
 
 # Overwrite system bounded script because it doesn't work well in docker
 ADD bin/xvfb-run /usr/bin/xvfb-run
+RUN chmod 755 /usr/bin/xvfb-run
 
 ENV WINE_MONO_VERSION 4.7.1
 # Get latest version of mono for wine, installed by wine upon demand
