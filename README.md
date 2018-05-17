@@ -10,8 +10,15 @@ Docker container based on suchja/* and Ubuntu Bionic (18.04) containing the foll
 
 The default wine environment is 32bit.
 
+Environment variables:
+* myuser (defaults to jenkins)
+* myuid (defaults to 1000)
+* mygroup (defaults to jenkins)
+* mygid (defaults to 1000)
+
+
 ```
-docker run --rm -it --entrypoint /bin/bash v install-win:/home/xclient/install-win vcc/winpack \
-    xvfb-run -f /home/xclient/.Xauthority -a wine reshack/ResourceHacker.exe -open sample.exe -save sample_new.exe -action delete -mask
+docker run --rm -it --entrypoint /bin/bash -v install-win:/home/jenkins/install-win vcc/winpack \
+    xvfb-run -f /home/jenkins/.Xauthority -a wine reshack/ResourceHacker.exe -open sample.exe -save sample_new.exe -action delete -mask
 ,,, -log CONSOLE
 ```

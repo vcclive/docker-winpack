@@ -2,6 +2,11 @@ FROM ubuntu:18.04
 MAINTAINER Tamas Jalsovszky <tamas.jalsovszky@vcc.live>
 # Inspired by suchja/*
 
+ENV myuser jenkins
+ENV myuid 1000
+ENV mygroup jenkins
+ENV mygid 1000
+
 COPY waitonprocess.sh /scripts/
 RUN chmod 755 /scripts/waitonprocess.sh
 
@@ -10,18 +15,19 @@ ENV WINEDEBUG -all,err+all
 
 # first create user and group for all the X Window stuff
 # required to do this first so we have consistent uid/gid between server and client container
-RUN addgroup --system xusers \
+RUN addgroup --system $mygroup --gid $mygid \
 	&& adduser \
-	    --home /home/xclient \
+	    --home /home/$myuser \
 	    --disabled-password \
 	    --shell /bin/bash \
 	    --gecos "user for running an xclient application" \
-	    --ingroup xusers \
+	    --ingroup $mygroup \
 	    --quiet \
-	    xclient
+	    --uid $myuid \
+	    $myuser
 
 # Use xclient's home dir as working dir
-WORKDIR /home/xclient
+WORKDIR /home/$myuser
 
 # Install some tools required for creating the image
 RUN dpkg --add-architecture i386
@@ -54,9 +60,9 @@ RUN mkdir -p /usr/share/wine/mono \
 	&& chmod +x /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi
 
 # Wine really doesn't like to be run as root, so let's use a non-root user
-USER xclient
-ENV HOME /home/xclient
-ENV WINEPREFIX /home/xclient/.wine32
+USER $myuser
+ENV HOME /home/$myuser
+ENV WINEPREFIX /home/$myuser/.wine32
 # set default wine arch
 ENV WINEARCH win32
 RUN wineboot --update
